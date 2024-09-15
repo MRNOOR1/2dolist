@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Combine
+import SwiftData
 
 struct TaskView: View {
     @Environment(\.modelContext) private var context
