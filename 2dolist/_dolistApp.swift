@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct _dolistApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.colorScheme, .light)
         }
+        .modelContainer(for: Task.self)
     }
 }
