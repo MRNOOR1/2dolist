@@ -1,4 +1,11 @@
 //
+//  TaskListView.swift
+//  2dolist
+//
+//  Created by Mohammad Rasoul Noori on 30/10/2024.
+//
+
+//
 //  TaskManager.swift
 //  2dolist
 //
@@ -11,7 +18,6 @@ import SwiftData
 
 struct TaskListView: View {
     @Environment(\.modelContext) var context
-    @State private var expandedTaskID: UUID?
     @State private var isAddingTask = false
     @Query var Tasks : [Task]
     var body: some View {
@@ -23,7 +29,7 @@ struct TaskListView: View {
                         .foregroundColor(.white)
                 }, description: {
                     Text("ADD TASKS TO SEE YOUR LIST")
-                        .foregroundColor(Color.teal)
+                        .foregroundColor(Color.gray)
                 }, actions: {
                     Button {
                         isAddingTask = true
@@ -57,7 +63,6 @@ struct TaskListView: View {
                             TaskView(task: task)
                         }
                     }
-                    .scrollIndicators(.hidden)
                     Button {
                         isAddingTask = true
                     }label: {
@@ -81,5 +86,7 @@ struct TaskListView: View {
                 }
             }
         }
+        .navigationBarBackButtonHidden(false)
     }
 }
+

@@ -41,7 +41,7 @@ struct AddTaskView: View {
                 context.insert(task)
                 dismiss()
             }) {
-                Text("Save")
+                Text("CREATE")
                     .frame(width: 330, height: 50)
                     .font(.system(size: 25))
                     .fontWeight(.bold)
@@ -61,7 +61,3 @@ struct AddTaskView: View {
     
 }
 
-
-#Preview {
-    AddTaskView()
-}

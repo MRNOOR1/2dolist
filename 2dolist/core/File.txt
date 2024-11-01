@@ -1,0 +1,18 @@
+#Preview {
+    // Configure an in-memory model container for preview purposes
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Task.self, configurations: config)
+    
+    // Create some sample tasks
+    let task1 = Task(task: "Buy groceries", important: false, BirthDate: Date().addingTimeInterval(-4000))
+    let task2 = Task(task: "Finish project", important: true, BirthDate: Date().addingTimeInterval(-8000))
+    let task3 = Task(task: "Walk the dog", important: false, BirthDate: Date().addingTimeInterval(-2000))
+    
+    // Pass these tasks to `TaskListView` for the preview
+    TaskListView(
+        context: container.mainContext,
+        isAddingTask: false, // Set this according to how you want the preview to look
+        Tasks: [task1, task2, task3]
+    )
+    .modelContainer(container)
+}

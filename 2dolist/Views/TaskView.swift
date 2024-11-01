@@ -16,9 +16,12 @@ struct TaskView: View {
     @Bindable var task = Task()
     let notifications = NotificationManager()
     @State private var backgroundColor: Color = .white
-    @State private var expandedBackgroundSize: CGFloat = 180
-    @State private var backgroundSize: CGFloat = 80
+    @State private var ImportantbackgroundColor: Color = .red
+    @State private var LatebackgroundColor: Color = .yellow
+    @State private var expandedBackgroundSize: CGFloat = 200
+    @State private var backgroundSize: CGFloat = 100
     @State private var cancellable: AnyCancellable?
+    
     
     var body: some View {
         ZStack {
@@ -29,7 +32,7 @@ struct TaskView: View {
                         .font(.system(size: 25, weight: .semibold))
                         .fontDesign(.monospaced)
                         .foregroundColor(task.important ? .white : .black)
-                    Image(systemName: task.important ? "star" : "timer")
+                    Image(systemName: task.important ? "star.fill" : "timer")
                         .frame(width: 50)
                         .foregroundColor(task.important ? .white : .black)
                 }
@@ -42,6 +45,7 @@ struct TaskView: View {
                         }) {
                             Text("Complete")
                                 .frame(width: task.important ? 300 : 200, height: 50)
+                                .lineLimit(nil)
                                 .font(.system(size: task.important ? 40 : 20, weight: .bold))
                                 .foregroundColor(.white)
                                 .background(Color.green)
@@ -52,7 +56,7 @@ struct TaskView: View {
                             Text(task.formattedTime())
                                 .frame(width: 120, height: 50)
                                 .font(.system(size: 17, weight: .heavy))
-                                .foregroundColor(task.timeRemaining > 0 ? .white : .yellow)
+                                .foregroundColor(.white)
                                 .background(Color.red)
                                 .cornerRadius(15)
                                 .shadow(color: Color.red.opacity(0.5), radius: 3.5)
@@ -61,11 +65,11 @@ struct TaskView: View {
                     .padding(.top)
                 }
             }
+            .padding(10)
             .frame(width: 350, height: isExpanded ? expandedBackgroundSize : backgroundSize)
             .font(.system(size: 30, weight: .medium))
-            .foregroundColor(.black)
-            .background(task.important ? .red : backgroundColor)
-            .cornerRadius(30)
+            .background(task.important ? ImportantbackgroundColor : (task.timeRemaining < 3600 ? LatebackgroundColor : backgroundColor))
+            .cornerRadius(25)
             .onTapGesture {
                 withAnimation(Animation.easeInOut(duration: 0.4)) {
                     isExpanded.toggle()
@@ -104,8 +108,11 @@ struct TaskView: View {
     
     internal func markAsComplete() {
         withAnimation(.easeInOut(duration: 1)) {
+            LatebackgroundColor = .green
+            ImportantbackgroundColor = .green
             backgroundColor = .green
         }
+        
         withAnimation(.easeInOut(duration: 1.5)) {
             backgroundSize = 0
             expandedBackgroundSize = 0

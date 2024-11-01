@@ -19,13 +19,13 @@ class Task {
     init(task: String = " ", important: Bool = false) {
         self.task = task
         self.important = important
-        self.expirationDate = Date().addingTimeInterval(10)//86400) // Initialize the creation time to the current date and time
+        self.expirationDate = Date().addingTimeInterval(86400)
         self.timeRemaining = 0
         self.updateRemainingTime()
     }
 
     func formattedTime() -> String {
-        updateRemainingTime()
+        //updateRemainingTime()
         let hours = Int(timeRemaining) / 3600
         if hours <= 1 {
             return "\(hours) HR"  // Returns "1 HR" when exactly one hour remains
