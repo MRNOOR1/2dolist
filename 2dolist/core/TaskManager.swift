@@ -53,7 +53,7 @@ struct TaskListView: View {
             else {
                 VStack{
                     ScrollView {
-                        ForEach(Tasks) { task in
+                        ForEach(Tasks.sorted { $0.important && !$1.important }) { task in
                             TaskView(task: task)
                         }
                     }

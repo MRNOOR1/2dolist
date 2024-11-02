@@ -14,9 +14,8 @@ struct TaskView: View {
     @Environment(\.modelContext) private var context
     @State private var isExpanded = false
     @Bindable var task = Task()
-    let notifications = NotificationManager()
     @State private var backgroundColor: Color = .white
-    @State private var ImportantbackgroundColor: Color = .red
+    @State private var ImportantbackgroundColor: Color = Color("important")
     @State private var LatebackgroundColor: Color = .yellow
     @State private var expandedBackgroundSize: CGFloat = 200
     @State private var backgroundSize: CGFloat = 100
@@ -32,6 +31,9 @@ struct TaskView: View {
                         .font(.system(size: 25, weight: .semibold))
                         .fontDesign(.monospaced)
                         .foregroundColor(task.important ? .white : .black)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(nil)
+                        .frame(minHeight: 60)
                     Image(systemName: task.important ? "star.fill" : "timer")
                         .frame(width: 50)
                         .foregroundColor(task.important ? .white : .black)
@@ -43,29 +45,30 @@ struct TaskView: View {
                         Button(action: {
                             markAsComplete()
                         }) {
-                            Text("Complete")
-                                .frame(width: task.important ? 300 : 200, height: 50)
+                            Text("COMPLETE")
+                                .frame(width: task.important ? 300 : 200, height: 60)
                                 .lineLimit(nil)
                                 .font(.system(size: task.important ? 40 : 20, weight: .bold))
                                 .foregroundColor(.white)
                                 .background(Color.green)
-                                .cornerRadius(15)
+                                .cornerRadius(25)
                                 .shadow(color: Color.green.opacity(0.5), radius: 3.5)
                         }
                         if !task.important {
                             Text(task.formattedTime())
-                                .frame(width: 120, height: 50)
+                                .frame(width: 120, height: 60)
                                 .font(.system(size: 17, weight: .heavy))
                                 .foregroundColor(.white)
                                 .background(Color.red)
-                                .cornerRadius(15)
+                                .cornerRadius(25)
                                 .shadow(color: Color.red.opacity(0.5), radius: 3.5)
                         }
                     }
                     .padding(.top)
                 }
+                
             }
-            .padding(10)
+            .padding(.bottom, 5)
             .frame(width: 350, height: isExpanded ? expandedBackgroundSize : backgroundSize)
             .font(.system(size: 30, weight: .medium))
             .background(task.important ? ImportantbackgroundColor : (task.timeRemaining < 3600 ? LatebackgroundColor : backgroundColor))
@@ -73,6 +76,13 @@ struct TaskView: View {
             .onTapGesture {
                 withAnimation(Animation.easeInOut(duration: 0.4)) {
                     isExpanded.toggle()
+                    if isExpanded {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                            withAnimation(Animation.easeInOut(duration: 0.8)) {
+                                isExpanded = false
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -90,9 +100,6 @@ struct TaskView: View {
             .autoconnect()
             .sink { _ in
                 task.updateRemainingTime()
-                if task.timeRemaining <= 3600 && task.timeRemaining > 3595 {
-                    notifications.sendNotification(taskName: task.task)
-                }
                 if task.timeRemaining <= 0 {
                     if !task.important {
                         markAsComplete()
@@ -101,6 +108,7 @@ struct TaskView: View {
                 }
             }
     }
+    
     
     private func stopTimer() {
         cancellable?.cancel()
@@ -111,6 +119,9 @@ struct TaskView: View {
             LatebackgroundColor = .green
             ImportantbackgroundColor = .green
             backgroundColor = .green
+            if let notificationID = task.notificationID {
+                notifications.cancelNotification(with: notificationID)
+            }
         }
         
         withAnimation(.easeInOut(duration: 1.5)) {

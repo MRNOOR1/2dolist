@@ -46,7 +46,7 @@ struct ContentView: View {
         }
         .onAppear{
             forecast()
-            notificationManager.AskPermission()
+            notificationManager.askPermission()
         }
         
     }

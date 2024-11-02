@@ -1,4 +1,3 @@
-//
 //  Notification.swift
 //  2dolist
 //
@@ -10,32 +9,52 @@ import UserNotifications
 
 class NotificationManager {
     
-    func AskPermission(){
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
-        { success, error in
+    func askPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
             if success {
                 print("All set!")
-            } else if let error {
+            } else if let error = error {
                 print(error.localizedDescription)
             }
         }
     }
     
-    func sendNotification(taskName: String){
+    func sendNotification(taskName: String, at time: Date) -> String {
         let content = UNMutableNotificationContent()
-        content.title = "1 Hour to complete the task"
-        content.subtitle = taskName
-        content.sound = UNNotificationSound.default
+        content.title = "Last hour Reminder"
+        content.body = "complete your task: \(taskName)"
+        content.sound = UNNotificationSound.defaultCritical
+
         
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        // choose a random identifier
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        var timeInterval = time.timeIntervalSinceNow
         
+        if abs(timeInterval) <= 30 {
+            timeInterval = 1
+            print("Adjusted timeInterval for buffer: \(timeInterval) seconds")
+        } else if timeInterval < 60 {
+            
+            print("Notification time interval is below 60 seconds; scheduling canceled.")
+            return ""
+        }
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+        let requestID = UUID().uuidString
+        let request = UNNotificationRequest(identifier: requestID, content: content, trigger: trigger)
+
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("Error adding notification: \(error.localizedDescription)")
+            } else {
+                print("Notification scheduled with timeInterval: \(timeInterval) seconds, ID: \(requestID)")
             }
         }
+
+        return requestID
+    }
+
+    
+    func cancelNotification(with id: String) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id])
+        print("Canceled notification with ID: \(id)")
     }
 }
-

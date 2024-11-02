@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>2dolist.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>2</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>3602D40FF724DAA44FC9EAEBE2172F79B4A348FD</string>
+				<key>dateExpires</key>
+				<string>25/6/2025</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>Z9ADMKPYL7.MRN.-dolist</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>Z9ADMKPYL7</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>2dolist.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>14cb7fd1-3ecf-4d4c-a46e-8b7cd7723d41</string>
+				<key>dateExpires</key>
+				<string>25/6/2025</string>
+				<key>name</key>
+				<string>iOS Team Ad Hoc Provisioning Profile: MRN.-dolist</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>Z9ADMKPYL7</string>
+				<key>name</key>
+				<string>mohammad noori</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>2.2</string>
+		</dict>
+	</array>
+</dict>
+</plist>

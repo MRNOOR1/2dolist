@@ -8,22 +8,26 @@
 import SwiftUI
 import SwiftData
 import Foundation
-
+let notifications = NotificationManager()
 @Model
 class Task {
+    
     var task: String
     var important: Bool
     var timeRemaining: TimeInterval
     var expirationDate: Date
-
+    var notificationID: String?
+    
     init(task: String = " ", important: Bool = false) {
         self.task = task
         self.important = important
         self.expirationDate = Date().addingTimeInterval(86400)
         self.timeRemaining = 0
         self.updateRemainingTime()
+        let notificationTime = Date().addingTimeInterval(100)
+        notificationID = notifications.sendNotification(taskName: self.task, at: notificationTime)
     }
-
+    
     func formattedTime() -> String {
         //updateRemainingTime()
         let hours = Int(timeRemaining) / 3600
@@ -33,12 +37,12 @@ class Task {
             return "\(hours) HRs"  // Returns the number of hours followed by "HRs" for other cases
         }
     }
-
+    
     func updateRemainingTime() {
         let currentTime = Date()
         timeRemaining = expirationDate.timeIntervalSince(currentTime)
     }
     
-
+    
 }
 
