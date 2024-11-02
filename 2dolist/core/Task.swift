@@ -24,8 +24,6 @@ class Task {
         self.expirationDate = Date().addingTimeInterval(86400)
         self.timeRemaining = 0
         self.updateRemainingTime()
-        let notificationTime = Date().addingTimeInterval(100)
-        notificationID = notifications.sendNotification(taskName: self.task, at: notificationTime)
     }
     
     func formattedTime() -> String {
