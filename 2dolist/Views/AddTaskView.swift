@@ -38,7 +38,7 @@ struct AddTaskView: View {
             .padding()
             Button(action: {
                 let task = Task(task: newTaskName, important: isImportant)
-                if isImportant {
+                if !isImportant {
                     let notificationTime = Date().addingTimeInterval(11 * 3600)
                     task.notificationID = notifications.sendNotification(taskName: newTaskName, at: notificationTime)
                 }
