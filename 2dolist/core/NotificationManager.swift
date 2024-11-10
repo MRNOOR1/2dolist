@@ -21,7 +21,7 @@ class NotificationManager {
     
     func sendNotification(taskName: String, at time: Date) -> String {
         let content = UNMutableNotificationContent()
-        content.title = "Last hour Reminder"
+        content.title = "Reminder"
         content.body = "complete your task: \(taskName)"
         content.sound = UNNotificationSound.defaultCritical
 
