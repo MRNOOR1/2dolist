@@ -21,32 +21,40 @@ struct TaskView: View {
     @State private var cancellable: AnyCancellable?
     @State private var hideContent = false
     @State private var collapseWorkItem: DispatchWorkItem?
-    
+    @State private var colorIndex = 0
     private let exoticColors: [Color] = [
-        // A rich emerald green
-        Color(red: 0/255,   green: 128/255, blue: 96/255),  // “Emerald Heart”
-
-        // A dark teal with depth
-        Color(red: 0/255,   green: 105/255, blue: 92/255),  // “Deep Teal”
-
-        // A brilliant sapphire blue
-        Color(red: 15/255,  green: 82/255,  blue: 186/255), // “Sapphire Dream”
-
-        // A royal midnight blue
-        Color(red: 0/255,   green: 53/255,  blue: 128/255), // “Royal Night”
-
-        // A true metallic gold
-        Color(red: 212/255, green: 175/255, blue: 55/255),  // “Golden Opulence”
-
-        // A warm amber-gold
-        Color(red: 255/255, green: 193/255, blue: 7/255),   // “Amber Sunset”
-
-        // A bright turquoise for contrast
-        Color(red: 64/255,  green: 224/255, blue: 208/255), // “Tropical Turquoise”
-
-        // A vivid teal-blue hybrid
-        Color(red: 0/255,   green: 150/255, blue: 199/255)  // “Ocean Jewel”
-    ]
+        // Emerald Abyss – Deep, dark green with blue undertones
+        Color(red:   0/255, green: 100/255, blue:  80/255),
+        // Sapphire Storm – Intense blue with violet sparks
+        Color(red:  20/255, green:  50/255, blue: 180/255),
+        // Blood Garnet – Lush red with hints of black
+        Color(red: 120/255, green:   0/255, blue:  20/255),
+        // Solar Citrine – Bright yellow-gold, glows like a lantern
+        Color(red: 255/255, green: 204/255, blue:   0/255),
+        // Obsidian Rose – Near-black purple with red glint
+        Color(red:  40/255, green:   0/255, blue:  40/255),
+        // Frozen Lapis – Icy cobalt with hints of grey
+        Color(red:   0/255, green:  80/255, blue: 150/255),
+        // Deep Amaranth – Bold magenta-red with rare depth
+        Color(red: 155/255, green:   0/255, blue:  75/255),
+        // Peacock Vein – Vivid turquoise-green
+        Color(red:   0/255, green: 170/255, blue: 140/255),
+        // Crushed Topaz – Metallic burnt orange
+        Color(red: 204/255, green:  85/255, blue:   0/255),
+        // Midnight Malachite – Saturated forest green
+        Color(red:   0/255, green:  90/255, blue:  60/255),
+        // Glacial Orchid – Blue-leaning pale violet
+        Color(red: 115/255, green:  90/255, blue: 170/255),
+        // Dragonite Bronze – Rich bronze-gold alloy
+        Color(red: 160/255, green: 110/255, blue:  50/255),
+        // Nocturne Cyanide – Toxic teal-blue glow
+        Color(red:   0/255, green: 210/255, blue: 170/255),
+        // Cursed Ruby – Blackened crimson red
+        Color(red:  90/255, green:   0/255, blue:   0/255),
+        // Celestial Void – Blue-black with cosmic energy
+        Color(red:  10/255, green:  15/255, blue:  40/255),
+        Color(red: 134/255, green:   0/255, blue:   0/255)   // <— Your Bloodstone
+       ]
 
 
     var body: some View {
@@ -131,9 +139,10 @@ struct TaskView: View {
     private func longPressToToggleImportant() -> some Gesture {
         LongPressGesture(minimumDuration: 0.5)
             .onEnded { _ in
+                colorIndex = (colorIndex + 1) % exoticColors.count
                 withAnimation(.easeInOut(duration: 0.5)) {
                     if task.important {
-                        ImportantbackgroundColor = exoticColors.randomElement()!
+                        ImportantbackgroundColor = exoticColors[colorIndex]
                     } else {
                         task.important = true
                     }
