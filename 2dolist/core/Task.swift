@@ -11,7 +11,6 @@ import Foundation
 let notifications = NotificationManager()
 @Model
 class Task {
-    
     var task: String
     var important: Bool
     var timeRemaining: TimeInterval
