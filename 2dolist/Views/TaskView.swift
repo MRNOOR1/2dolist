@@ -55,8 +55,6 @@ struct TaskView: View {
         Color(red:  10/255, green:  15/255, blue:  40/255),
         Color(red: 134/255, green:   0/255, blue:   0/255)   // <— Your Bloodstone
        ]
-
-
     var body: some View {
         ZStack {
             VStack {

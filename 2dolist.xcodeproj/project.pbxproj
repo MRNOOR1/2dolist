@@ -17,6 +17,7 @@
 		27AA4FF92BC3AC41009C1ED6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AA4FF82BC3AC41009C1ED6 /* ContentView.swift */; };
 		27AA4FFB2BC3AC42009C1ED6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27AA4FFA2BC3AC42009C1ED6 /* Assets.xcassets */; };
 		27AA4FFE2BC3AC42009C1ED6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */; };
+		27E9831A2DFD540A00B311AC /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27E983192DFD540A00B311AC /* SwiftData.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +42,7 @@
 		27AA4FF82BC3AC41009C1ED6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		27AA4FFA2BC3AC42009C1ED6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		27E983192DFD540A00B311AC /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27E9831A2DFD540A00B311AC /* SwiftData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				27AA4FF52BC3AC41009C1ED6 /* 2dolist */,
+				27E983182DFD540900B311AC /* Frameworks */,
 				27AA4FF42BC3AC41009C1ED6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -116,6 +120,14 @@
 				27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		27E983182DFD540900B311AC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				27E983192DFD540A00B311AC /* SwiftData.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -427,7 +439,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -464,7 +476,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
