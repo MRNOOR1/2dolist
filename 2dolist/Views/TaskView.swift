@@ -143,6 +143,9 @@ struct TaskView: View {
                         ImportantbackgroundColor = exoticColors[colorIndex]
                     } else {
                         task.important = true
+                        if let id = task.notificationID {
+                            notifications.cancelNotification(with: id)
+                        }
                     }
                 }
                 do {
