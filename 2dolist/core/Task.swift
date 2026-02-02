@@ -8,20 +8,28 @@
 import SwiftUI
 import SwiftData
 import Foundation
+
 let notifications = NotificationManager()
+
 @Model
 class Task {
+    @Attribute(.unique) var id: UUID
     var task: String
     var important: Bool
     var timeRemaining: TimeInterval
     var expirationDate: Date
     var notificationID: String?
+    var isCompleted: Bool
+    var completedAt: Date?
     
     init(task: String = " ", important: Bool = false) {
+        self.id = UUID()
         self.task = task
         self.important = important
         self.expirationDate = Date().addingTimeInterval(86400)
         self.timeRemaining = 0
+        self.isCompleted = false
+        self.completedAt = nil
         self.updateRemainingTime()
     }
     

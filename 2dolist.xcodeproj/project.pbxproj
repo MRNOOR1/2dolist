@@ -18,6 +18,8 @@
 		27AA4FFB2BC3AC42009C1ED6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27AA4FFA2BC3AC42009C1ED6 /* Assets.xcassets */; };
 		27AA4FFE2BC3AC42009C1ED6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */; };
 		27E9831A2DFD540A00B311AC /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27E983192DFD540A00B311AC /* SwiftData.framework */; };
+		DD1E8FF92F30A09900D52BE0 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1E8FF82F30A09900D52BE0 /* AppSettings.swift */; };
+		DD1E8FFB2F30A0A900D52BE0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1E8FFA2F30A0A900D52BE0 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +45,8 @@
 		27AA4FFA2BC3AC42009C1ED6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		27E983192DFD540A00B311AC /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
+		DD1E8FF82F30A09900D52BE0 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		DD1E8FFA2F30A0A900D52BE0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,8 @@
 				2739143E2BEF70680015963B /* Views */,
 				27953BA92C4B90C000CDE87E /* core */,
 				27AA4FFC2BC3AC42009C1ED6 /* Preview Content */,
+				DD1E8FF82F30A09900D52BE0 /* AppSettings.swift */,
+				DD1E8FFA2F30A0A900D52BE0 /* SettingsView.swift */,
 			);
 			path = 2dolist;
 			sourceTree = "<group>";
@@ -176,7 +182,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					27371DC82C9551D8005D0A34 = {
 						CreatedOnToolsVersion = 15.4;
@@ -241,9 +247,11 @@
 				27AA4FF92BC3AC41009C1ED6 /* ContentView.swift in Sources */,
 				273914442BEF70EC0015963B /* AddTaskView.swift in Sources */,
 				27953BAB2C4B90D300CDE87E /* NotificationManager.swift in Sources */,
+				DD1E8FFB2F30A0A900D52BE0 /* SettingsView.swift in Sources */,
 				273914422BEF70D10015963B /* TaskView.swift in Sources */,
 				27953BAD2C4B90E700CDE87E /* Task.swift in Sources */,
 				27953BAF2C4B90F200CDE87E /* TaskManager.swift in Sources */,
+				DD1E8FF92F30A09900D52BE0 /* AppSettings.swift in Sources */,
 				27AA4FF72BC3AC41009C1ED6 /* _dolistApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -265,7 +273,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z9ADMKPYL7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
@@ -284,7 +291,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z9ADMKPYL7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
@@ -332,6 +338,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Z9ADMKPYL7;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -357,6 +364,7 @@
 				NEW_SETTING1 = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -397,6 +405,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Z9ADMKPYL7;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -415,6 +424,7 @@
 				NEW_SETTING = "";
 				NEW_SETTING1 = "";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -429,7 +439,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"2dolist/Preview Content\"";
-				DEVELOPMENT_TEAM = Z9ADMKPYL7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "-dolist-Info.plist";
@@ -466,7 +475,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"2dolist/Preview Content\"";
-				DEVELOPMENT_TEAM = Z9ADMKPYL7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "-dolist-Info.plist";

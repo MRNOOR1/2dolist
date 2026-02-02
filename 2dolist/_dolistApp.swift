@@ -10,11 +10,24 @@ import SwiftData
 
 @main
 struct _dolistApp: App {
+    let container: ModelContainer
+    
+    init() {
+        do {
+            // Create container with explicit configuration
+            let schema = Schema([Task.self])
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+            container = try ModelContainer(for: schema, configurations: [config])
+            print("✅ Model container initialized successfully")
+        } catch {
+            fatalError("❌ Failed to initialize model container: \(error)")
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.colorScheme, .light)
         }
-        .modelContainer(for: Task.self)
+        .modelContainer(container)
     }
 }

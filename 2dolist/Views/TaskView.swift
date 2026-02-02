@@ -12,103 +12,136 @@ import SwiftData
 
 struct TaskView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.colorScheme) var colorScheme
     @State private var isExpanded = false
-    @Bindable var task = Task()
-    @State private var backgroundColor: Color = .white
-    @State private var ImportantbackgroundColor: Color = Color("important")
+    @Bindable var task: Task
+    let isCompleted: Bool // Track if task is in completed section
+    @State private var settings = AppSettings.shared
+    @State private var ImportantbackgroundColor: Color = AppSettings.shared.importantTaskColor.color
     @State private var LatebackgroundColor: Color = .yellow
     @State private var backgroundSize: CGFloat = 100
     @State private var cancellable: AnyCancellable?
     @State private var hideContent = false
     @State private var collapseWorkItem: DispatchWorkItem?
-    @State private var colorIndex = 0
-    private let exoticColors: [Color] = [
-        // Emerald Abyss – Deep, dark green with blue undertones
-        Color(red:   0/255, green: 100/255, blue:  80/255),
-        // Sapphire Storm – Intense blue with violet sparks
-        Color(red:  20/255, green:  50/255, blue: 180/255),
-        // Blood Garnet – Lush red with hints of black
-        Color(red: 120/255, green:   0/255, blue:  20/255),
-        // Solar Citrine – Bright yellow-gold, glows like a lantern
-        Color(red: 255/255, green: 204/255, blue:   0/255),
-        // Obsidian Rose – Near-black purple with red glint
-        Color(red:  40/255, green:   0/255, blue:  40/255),
-        // Frozen Lapis – Icy cobalt with hints of grey
-        Color(red:   0/255, green:  80/255, blue: 150/255),
-        // Deep Amaranth – Bold magenta-red with rare depth
-        Color(red: 155/255, green:   0/255, blue:  75/255),
-        // Peacock Vein – Vivid turquoise-green
-        Color(red:   0/255, green: 170/255, blue: 140/255),
-        // Crushed Topaz – Metallic burnt orange
-        Color(red: 204/255, green:  85/255, blue:   0/255),
-        // Midnight Malachite – Saturated forest green
-        Color(red:   0/255, green:  90/255, blue:  60/255),
-        // Glacial Orchid – Blue-leaning pale violet
-        Color(red: 115/255, green:  90/255, blue: 170/255),
-        // Dragonite Bronze – Rich bronze-gold alloy
-        Color(red: 160/255, green: 110/255, blue:  50/255),
-        // Nocturne Cyanide – Toxic teal-blue glow
-        Color(red:   0/255, green: 210/255, blue: 170/255),
-        // Cursed Ruby – Blackened crimson red
-        Color(red:  90/255, green:   0/255, blue:   0/255),
-        // Celestial Void – Blue-black with cosmic energy
-        Color(red:  10/255, green:  15/255, blue:  40/255),
-        Color(red: 134/255, green:   0/255, blue:   0/255)   // <— Your Bloodstone
-       ]
+    
+    // Computed property for background color based on color scheme
+    private var regularBackgroundColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
+    // Computed property for text color based on background
+    private var regularTextColor: Color {
+        colorScheme == .dark ? .black : .white
+    }
+    
     var body: some View {
         ZStack {
-            VStack {
-                HStack {
+            VStack(spacing: 8) {
+                HStack(spacing: 12) {
                     Text(task.task)
-                        .frame(width: 250, alignment: .leading)
-                        .font(.system(size: 25, weight: .semibold))
+                        .frame(width: 240, alignment: .leading)
+                        .font(.system(size: 22, weight: .semibold))
                         .fontDesign(.monospaced)
-                        .foregroundColor(task.important ? .white : .black)
+                        .foregroundColor(
+                            isCompleted ? .gray :
+                            (task.important ? .white : regularTextColor)
+                        )
+                        .strikethrough(isCompleted, color: .gray)
                         .multilineTextAlignment(.leading)
                         .lineLimit(nil)
-                        .frame(minHeight: 60)
-                    Image(systemName: task.important ? "star.fill" : "timer")
-                        .frame(width: 50)
-                        .foregroundColor(task.important ? .white : .black)
+                        .frame(minHeight: 50)
+                    
+                    Spacer()
+                    
+                    Image(systemName: 
+                        isCompleted ? "checkmark.circle.fill" :
+                        (task.important ? "star.fill" : "timer")
+                    )
+                        .font(.system(size: 24))
+                        .foregroundColor(
+                            isCompleted ? .green :
+                            (task.important ? .white : regularTextColor)
+                        )
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
                 
-                if isExpanded {
-                    HStack {
+                if isExpanded && !isCompleted {
+                    if task.important {
+                        // Important task - full width complete button
                         Button(action: {
                             markAsComplete()
                         }) {
                             Text("COMPLETE")
-                                .frame(width: task.important ? 300 : 200, height: 60)
-                                .lineLimit(nil)
-                                .font(.system(size: task.important ? 40 : 20, weight: .bold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.white)
                                 .background(Color.green)
-                                .cornerRadius(25)
+                                .cornerRadius(20)
                                 .shadow(color: Color.green.opacity(0.5), radius: 3.5)
                         }
-                        if !task.important {
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
+                    } else {
+                        // Regular task - complete button + timer side by side
+                        HStack(spacing: 8) {
+                            Button(action: {
+                                markAsComplete()
+                            }) {
+                                Text("COMPLETE")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .background(Color.green)
+                                    .cornerRadius(20)
+                                    .shadow(color: Color.green.opacity(0.5), radius: 3.5)
+                            }
+                            
                             Text(task.formattedTime())
-                                .frame(width: 120, height: 60)
-                                .font(.system(size: 17, weight: .heavy))
+                                .frame(width: 100)
+                                .padding(.vertical, 14)
+                                .font(.system(size: 16, weight: .heavy))
                                 .foregroundColor(.white)
                                 .background(Color.red)
-                                .cornerRadius(25)
+                                .cornerRadius(20)
                                 .shadow(color: Color.red.opacity(0.5), radius: 3.5)
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
                     }
-                    .padding(.top)
+                }
+                
+                // Show completion info for completed tasks
+                if isExpanded && isCompleted {
+                    VStack(spacing: 6) {
+                        Text("✓ COMPLETED")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.green)
+                        if let completedAt = task.completedAt {
+                            Text(completedAt, style: .date)
+                                .font(.system(size: 13))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.bottom, 8)
                 }
                 
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, 8)
             .opacity(hideContent ? 0 : 1)
-            .frame(width: 350)
+            .frame(maxWidth: .infinity)
             .frame(height: isExpanded ? nil : backgroundSize)
             .fixedSize(horizontal: false, vertical: isExpanded)
-            .font(.system(size: 30, weight: .medium))
-            .background(task.important ? ImportantbackgroundColor : (task.timeRemaining < 3600 ? LatebackgroundColor : backgroundColor))
-            .cornerRadius(25)
+            .background(
+                // Determine background color based on completion status
+                isCompleted ? Color.gray.opacity(0.3) :
+                (task.important ? ImportantbackgroundColor : 
+                 (task.timeRemaining < 3600 ? LatebackgroundColor : regularBackgroundColor))
+            )
+            .cornerRadius(20)
+            .padding(.horizontal, 4)
             .onTapGesture {
                  collapseWorkItem?.cancel()
                  withAnimation(.easeInOut(duration: 0.5)) {
@@ -124,7 +157,7 @@ struct TaskView: View {
                      DispatchQueue.main.asyncAfter(deadline: .now() + 3.5, execute: item)
                  }
                }
-            .highPriorityGesture(longPressToToggleImportant())
+            .highPriorityGesture(isCompleted ? nil : longPressToToggleImportant())
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
@@ -137,12 +170,13 @@ struct TaskView: View {
     private func longPressToToggleImportant() -> some Gesture {
         LongPressGesture(minimumDuration: 0.5)
             .onEnded { _ in
-                colorIndex = (colorIndex + 1) % exoticColors.count
                 withAnimation(.easeInOut(duration: 0.5)) {
                     if task.important {
-                        ImportantbackgroundColor = exoticColors[colorIndex]
+                        // Already important - do nothing or cycle through colors if needed
+                        // Keep current behavior without cycling
                     } else {
                         task.important = true
+                        ImportantbackgroundColor = settings.importantTaskColor.color
                         if let id = task.notificationID {
                             notifications.cancelNotification(with: id)
                         }
@@ -180,7 +214,6 @@ struct TaskView: View {
             notifications.cancelNotification(with: id)
         }
         withAnimation(.easeInOut(duration: 1)) {
-            backgroundColor = .green
             LatebackgroundColor = .green
             ImportantbackgroundColor = .green
             hideContent = true
@@ -189,11 +222,14 @@ struct TaskView: View {
             isExpanded = false
             backgroundSize = 0
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            withAnimation() {
-                context.delete(task)
-                try? context.save()
+            task.isCompleted = true
+            task.completedAt = Date()
+            do {
+                try context.save()
+            } catch {
+                print("Failed to save completed state:", error)
             }
         }
     }
