@@ -5,10 +5,10 @@ struct AddTaskView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var context
     @Environment(\.colorScheme) var colorScheme
+    @Environment(AppSettings.self) private var settings
     @State private var newTaskName: String = ""
     @State private var isImportant: Bool = false
     @State private var dueDate: Date = Date().addingTimeInterval(24 * 3600)
-    @State private var settings = AppSettings.shared
     
     var body: some View {
         VStack(spacing: 20) {
@@ -58,6 +58,11 @@ struct AddTaskView: View {
             
             Button(action: {
                 let task = Task(task: newTaskName, important: isImportant)
+                // Assign a varied color index for important tasks
+                if isImportant {
+                    let count = ImportantColorPalette.count(for: settings.selectedImportantGroup)
+                    task.importantColorIndex = count > 0 ? abs(task.id.hashValue) % count : 0
+                }
                 task.expirationDate = dueDate
                 if !isImportant {
                     task.notificationID = notifications.sendNotification(taskName: newTaskName, at: dueDate)

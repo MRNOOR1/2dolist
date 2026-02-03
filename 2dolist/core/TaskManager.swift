@@ -15,7 +15,7 @@ struct TaskListView: View {
     @State private var expandedTaskID: UUID?
     @State private var isAddingTask = false
     @State private var searchQuery: String = ""
-    @State private var settings = AppSettings.shared
+    @Environment(AppSettings.self) private var settings
     @Query var Tasks : [Task]
     let notifications = NotificationManager()
     

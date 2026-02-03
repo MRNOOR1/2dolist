@@ -5,10 +5,10 @@
 //  Created by Mohammad Rasoul Noori on 11/5/2024.
 //
 
-
 import SwiftUI
 import Combine
 import SwiftData
+import UIKit
 
 struct TaskView: View {
     @Environment(\.modelContext) private var context
@@ -16,13 +16,18 @@ struct TaskView: View {
     @State private var isExpanded = false
     @Bindable var task: Task
     let isCompleted: Bool // Track if task is in completed section
-    @State private var settings = AppSettings.shared
-    @State private var ImportantbackgroundColor: Color = AppSettings.shared.importantTaskColor.color
+    @Environment(AppSettings.self) private var settings
+    
+    @State private var ImportantbackgroundColor: Color = .clear
     @State private var LatebackgroundColor: Color = .yellow
     @State private var backgroundSize: CGFloat = 100
     @State private var cancellable: AnyCancellable?
     @State private var hideContent = false
     @State private var collapseWorkItem: DispatchWorkItem?
+    
+    private func colorForImportantIndex(_ index: Int) -> Color {
+        ImportantColorPalette.color(for: index, in: settings.selectedImportantGroup)
+    }
     
     // Computed property for background color based on color scheme
     private var regularBackgroundColor: Color {
@@ -53,7 +58,7 @@ struct TaskView: View {
                     
                     Spacer()
                     
-                    Image(systemName: 
+                    Image(systemName:
                         isCompleted ? "checkmark.circle.fill" :
                         (task.important ? "star.fill" : "timer")
                     )
@@ -62,9 +67,15 @@ struct TaskView: View {
                             isCompleted ? .green :
                             (task.important ? .white : regularTextColor)
                         )
+                    
+                    if task.important && !isExpanded && !isCompleted {
+                        Capsule()
+                            .fill(ImportantbackgroundColor)
+                            .frame(width: 14, height: 6)
+                    }
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.vertical, 6)
                 
                 if isExpanded && !isCompleted {
                     if task.important {
@@ -129,7 +140,7 @@ struct TaskView: View {
                 }
                 
             }
-            .padding(.bottom, 8)
+            .padding(.top, 4)
             .opacity(hideContent ? 0 : 1)
             .frame(maxWidth: .infinity)
             .frame(height: isExpanded ? nil : backgroundSize)
@@ -137,7 +148,7 @@ struct TaskView: View {
             .background(
                 // Determine background color based on completion status
                 isCompleted ? Color.gray.opacity(0.3) :
-                (task.important ? ImportantbackgroundColor : 
+                (task.important ? ImportantbackgroundColor :
                  (task.timeRemaining < 3600 ? LatebackgroundColor : regularBackgroundColor))
             )
             .cornerRadius(20)
@@ -161,6 +172,11 @@ struct TaskView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
+            if task.important {
+                ImportantbackgroundColor = colorForImportantIndex(task.importantColorIndex)
+            } else {
+                ImportantbackgroundColor = settings.importantTaskColor.color
+            }
             startTimer()
         }
         .onDisappear {
@@ -172,11 +188,15 @@ struct TaskView: View {
             .onEnded { _ in
                 withAnimation(.easeInOut(duration: 0.5)) {
                     if task.important {
-                        // Already important - do nothing or cycle through colors if needed
-                        // Keep current behavior without cycling
+                        // Cycle to next color index
+                        task.importantColorIndex = (task.importantColorIndex + 1) % ImportantColorPalette.count(for: settings.selectedImportantGroup)
+                        ImportantbackgroundColor = colorForImportantIndex(task.importantColorIndex)
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
                     } else {
                         task.important = true
-                        ImportantbackgroundColor = settings.importantTaskColor.color
+                        task.importantColorIndex = 0
+                        ImportantbackgroundColor = colorForImportantIndex(task.importantColorIndex)
                         if let id = task.notificationID {
                             notifications.cancelNotification(with: id)
                         }

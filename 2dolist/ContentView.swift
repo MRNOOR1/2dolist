@@ -4,12 +4,12 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) var context
     @Environment(\.colorScheme) var colorScheme
-    @Query var Tasks : [Task]
+    @Query var tasks: [Task]
     @Query(filter: #Predicate<Task> { $0.isCompleted == false }) private var activeTasks: [Task]
     @Query(filter: #Predicate<Task> { $0.isCompleted == true }) private var completedTasks: [Task]
     @State var weather : String = ""
     @State private var showingSettings = false
-    @State private var settings: AppSettings = AppSettings.shared
+    @Environment(AppSettings.self) private var settings
     let notificationManager = NotificationManager()
     var body: some View {
         NavigationStack {
@@ -75,7 +75,7 @@ struct ContentView: View {
         .onAppear{
             forecast()
             notificationManager.askPermission()
-            print("📱 ContentView appeared. Active tasks: \(activeTasks.count), Total tasks: \(Tasks.count)")
+            print("📱 ContentView appeared. Active tasks: \(activeTasks.count), Total tasks: \(tasks.count)")
         }
         .onChange(of: activeTasks.count) {
             forecast()

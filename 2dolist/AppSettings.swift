@@ -18,6 +18,13 @@ class AppSettings {
         }
     }
     
+    // Selected important task palette group
+    var selectedImportantGroup: ColorGroup = .reds {
+        didSet {
+            UserDefaults.standard.set(selectedImportantGroup.rawValue, forKey: "selectedImportantGroup")
+        }
+    }
+    
     // Button color scheme
     var buttonColorScheme: ButtonColorScheme = .blue {
         didSet {
@@ -30,6 +37,11 @@ class AppSettings {
         if let savedTaskColor = UserDefaults.standard.string(forKey: "importantTaskColor"),
            let taskColor = TaskColor(rawValue: savedTaskColor) {
             self.importantTaskColor = taskColor
+        }
+        
+        if let savedGroup = UserDefaults.standard.string(forKey: "selectedImportantGroup"),
+           let group = ColorGroup(rawValue: savedGroup) {
+            self.selectedImportantGroup = group
         }
         
         if let savedButtonScheme = UserDefaults.standard.string(forKey: "buttonColorScheme"),

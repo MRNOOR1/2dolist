@@ -16,6 +16,7 @@ class Task {
     @Attribute(.unique) var id: UUID
     var task: String
     var important: Bool
+    var importantColorIndex: Int
     var timeRemaining: TimeInterval
     var expirationDate: Date
     var notificationID: String?
@@ -26,6 +27,7 @@ class Task {
         self.id = UUID()
         self.task = task
         self.important = important
+        self.importantColorIndex = 0
         self.expirationDate = Date().addingTimeInterval(86400)
         self.timeRemaining = 0
         self.isCompleted = false

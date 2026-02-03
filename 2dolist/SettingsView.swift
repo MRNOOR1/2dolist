@@ -23,8 +23,11 @@ struct SettingsView: View {
                 Section {
                     ForEach(ColorGroup.allCases) { group in
                         Button(action: {
-                            // Select the first color in the group
-                            settings.importantTaskColor = group.colors.first!
+                            // Select this group and a default/base color in it
+                            settings.selectedImportantGroup = group
+                            if let first = group.colors.first {
+                                settings.importantTaskColor = first
+                            }
                         }) {
                             HStack {
                                 // Show preview of colors in the group
@@ -45,13 +48,17 @@ struct SettingsView: View {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.blue)
                                 }
+                                if settings.selectedImportantGroup == group {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
                             }
                         }
                     }
                 } header: {
                     Text("Important Task Color Theme")
                 } footer: {
-                    Text("Choose a color theme for tasks marked as important")
+                    Text("Choose a palette group and a base color for tasks marked as important")
                 }
                 
                 // Button Color Section

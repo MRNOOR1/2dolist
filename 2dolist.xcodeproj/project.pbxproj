@@ -18,6 +18,7 @@
 		27AA4FFB2BC3AC42009C1ED6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27AA4FFA2BC3AC42009C1ED6 /* Assets.xcassets */; };
 		27AA4FFE2BC3AC42009C1ED6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */; };
 		27E9831A2DFD540A00B311AC /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27E983192DFD540A00B311AC /* SwiftData.framework */; };
+		DD07D9D12F3201ED005333EC /* ImportantColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD07D9D02F3201ED005333EC /* ImportantColorPalette.swift */; };
 		DD1E8FF92F30A09900D52BE0 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1E8FF82F30A09900D52BE0 /* AppSettings.swift */; };
 		DD1E8FFB2F30A0A900D52BE0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1E8FFA2F30A0A900D52BE0 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
@@ -45,6 +46,7 @@
 		27AA4FFA2BC3AC42009C1ED6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27AA4FFD2BC3AC42009C1ED6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		27E983192DFD540A00B311AC /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
+		DD07D9D02F3201ED005333EC /* ImportantColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportantColorPalette.swift; sourceTree = "<group>"; };
 		DD1E8FF82F30A09900D52BE0 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		DD1E8FFA2F30A0A900D52BE0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,6 +118,7 @@
 				27AA4FFC2BC3AC42009C1ED6 /* Preview Content */,
 				DD1E8FF82F30A09900D52BE0 /* AppSettings.swift */,
 				DD1E8FFA2F30A0A900D52BE0 /* SettingsView.swift */,
+				DD07D9D02F3201ED005333EC /* ImportantColorPalette.swift */,
 			);
 			path = 2dolist;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 				27953BAD2C4B90E700CDE87E /* Task.swift in Sources */,
 				27953BAF2C4B90F200CDE87E /* TaskManager.swift in Sources */,
 				DD1E8FF92F30A09900D52BE0 /* AppSettings.swift in Sources */,
+				DD07D9D12F3201ED005333EC /* ImportantColorPalette.swift in Sources */,
 				27AA4FF72BC3AC41009C1ED6 /* _dolistApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -453,7 +457,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.2;
+				MARKETING_VERSION = 4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "MRN.-dolist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -489,7 +493,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.2;
+				MARKETING_VERSION = 4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "MRN.-dolist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
