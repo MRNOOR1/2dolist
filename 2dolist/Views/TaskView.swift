@@ -6,7 +6,6 @@
 import SwiftUI
 import Combine
 import SwiftData
-import UIKit
 
 struct TaskView: View {
     @Environment(\.modelContext) private var context
@@ -59,9 +58,12 @@ struct TaskView: View {
     private func nextOccurrence(after from: Date, days: [Int]) -> Date? {
         guard !days.isEmpty else { return nil }
         let cal = Calendar.current
-        let tc  = cal.dateComponents([.hour, .minute], from: from)
+        // Preserve the original scheduled hour/minute, but base day search from
+        // now when the task is overdue so it never reschedules into the past.
+        let base = from > Date() ? from : Date()
+        let tc   = cal.dateComponents([.hour, .minute], from: from)
         for offset in 1...7 {
-            guard let candidate = cal.date(byAdding: .day, value: offset, to: from) else { continue }
+            guard let candidate = cal.date(byAdding: .day, value: offset, to: base) else { continue }
             let weekday = cal.component(.weekday, from: candidate) - 1
             if days.contains(weekday) {
                 var dc = cal.dateComponents([.year, .month, .day], from: candidate)
@@ -149,6 +151,18 @@ struct TaskView: View {
                 }
                 .padding(.horizontal, 12)
                 .frame(height: 56)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    collapseWorkItem?.cancel()
+                    withAnimation(.easeInOut(duration: 0.25)) { isExpanded.toggle() }
+                    if isExpanded {
+                        let item = DispatchWorkItem {
+                            withAnimation(.easeInOut(duration: 0.25)) { isExpanded = false }
+                        }
+                        collapseWorkItem = item
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.5, execute: item)
+                    }
+                }
 
                 // ── Expanded: active ───────────────────────────────────────
                 if isExpanded && !isCompleted {
@@ -294,18 +308,7 @@ struct TaskView: View {
         .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
         .clipped()
         .opacity(hideContent ? 0 : 1)
-        .onTapGesture {
-            collapseWorkItem?.cancel()
-            withAnimation(.easeInOut(duration: 0.5)) { isExpanded.toggle() }
-            if isExpanded {
-                let item = DispatchWorkItem {
-                    withAnimation(.easeInOut(duration: 0.5)) { isExpanded = false }
-                }
-                collapseWorkItem = item
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5, execute: item)
-            }
-        }
-        .highPriorityGesture(isCompleted ? nil : longPressToToggleImportant())
+        .simultaneousGesture(isCompleted ? nil : longPressToToggleImportant())
         .sheet(isPresented: $isEditing, onDismiss: { editDetent = .height(540) }) {
             EditTaskView(task: task, selectedDetent: $editDetent)
                 .presentationDetents([.height(540), .height(640), .large], selection: $editDetent)

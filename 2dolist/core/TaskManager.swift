@@ -147,10 +147,11 @@ struct TaskListView: View {
                     Menu {
                         ForEach(SortOrder.allCases, id: \.self) { order in
                             Button(action: { sortOrder = order }) {
-                                Label(
-                                    order.rawValue,
-                                    systemImage: sortOrder == order ? "checkmark" : ""
-                                )
+                                if sortOrder == order {
+                                    Label(order.rawValue, systemImage: "checkmark")
+                                } else {
+                                    Text(order.rawValue)
+                                }
                             }
                         }
                     } label: {
@@ -158,7 +159,9 @@ struct TaskListView: View {
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(sortOrder != .dueDate ? accent : st)
                             .frame(width: 36, height: 36)
+                            .contentShape(Rectangle())
                     }
+                    .menuStyle(.automatic)
 
                     // Search toggle button
                     Button(action: {
