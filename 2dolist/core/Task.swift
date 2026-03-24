@@ -22,8 +22,15 @@ class Task {
     var notificationID: String?
     var isCompleted: Bool
     var completedAt: Date?
-    
-    init(task: String = " ", important: Bool = false) {
+    /// Weekday indices that this task repeats on. 0 = Sunday … 6 = Saturday.
+    /// Empty array means the task does not repeat.
+    var repeatDays: [Int] = []
+    /// Optional free-text notes attached to the task.
+    var notes: String = ""
+
+    var isRepeating: Bool { !repeatDays.isEmpty }
+
+    init(task: String = "", important: Bool = false) {
         self.id = UUID()
         self.task = task
         self.important = important
@@ -32,17 +39,20 @@ class Task {
         self.timeRemaining = 0
         self.isCompleted = false
         self.completedAt = nil
+        self.repeatDays = []
+        self.notes = ""
         self.updateRemainingTime()
     }
     
     func formattedTime() -> String {
-        //updateRemainingTime()
-        let hours = Int(timeRemaining) / 3600
-        if hours <= 1 {
-            return "\(hours) HR"  // Returns "1 HR" when exactly one hour remains
-        } else {
-            return "\(hours) HRs"  // Returns the number of hours followed by "HRs" for other cases
+        guard timeRemaining > 0 else { return "OVERDUE" }
+        let t = Int(timeRemaining)
+        let hours = t / 3600
+        if hours >= 1 {
+            return hours == 1 ? "1 HR" : "\(hours) HRS"
         }
+        let minutes = (t % 3600) / 60
+        return minutes == 1 ? "1 MIN" : "\(minutes) MINS"
     }
     
     func updateRemainingTime() {

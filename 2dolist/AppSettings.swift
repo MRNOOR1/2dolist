@@ -64,18 +64,24 @@ class AppSettings {
             return Color(red: 255/255, green: 127/255, blue: 80/255)
         case .pink:
             return Color(red: 255/255, green: 20/255, blue: 147/255)
-        case .neonGreen:
-            return Color(red: 57/255, green: 255/255, blue: 20/255)
+        case .neonGreen: return Color(red: 57/255,  green: 255/255, blue: 20/255)
+        case .red:       return Color(red: 215/255, green: 50/255,  blue: 45/255)
+        case .cyan:      return Color(red: 0/255,   green: 195/255, blue: 210/255)
+        case .amber:     return Color(red: 215/255, green: 145/255, blue: 0/255)
+        case .indigo:    return Color(red: 65/255,  green: 82/255,  blue: 185/255)
+        case .rose:      return Color(red: 210/255, green: 100/255, blue: 130/255)
         }
     }
-    
+
     func getButtonTextColor(for colorScheme: ColorScheme) -> Color {
         switch buttonColorScheme {
         case .default:
             // Inverse of button color for contrast
             return colorScheme == .dark ? .black : .white
-        case .blue, .purple, .teal, .orange, .pink, .neonGreen:
+        case .blue, .purple, .teal, .orange, .pink, .neonGreen, .red, .indigo, .rose:
             return .white
+        case .cyan, .amber:
+            return Color(red: 10/255, green: 10/255, blue: 10/255)
         }
     }
 }
@@ -310,7 +316,12 @@ enum ButtonColorScheme: String, CaseIterable, Identifiable {
     case orange = "Orange"
     case pink = "Pink"
     case neonGreen = "Neon Green"
-    
+    case red       = "Red"
+    case cyan      = "Cyan"
+    case amber     = "Amber"
+    case indigo    = "Indigo"
+    case rose      = "Rose"
+
     var id: String { rawValue }
     
     var description: String {
@@ -327,11 +338,15 @@ enum ButtonColorScheme: String, CaseIterable, Identifiable {
             return "Coral Orange"
         case .pink:
             return "Electric Pink"
-        case .neonGreen:
-            return "Neon Green Glow"
+        case .neonGreen: return "Neon Green Glow"
+        case .red:       return "Signal Red"
+        case .cyan:      return "Electric Cyan"
+        case .amber:     return "Warm Amber"
+        case .indigo:    return "Deep Indigo"
+        case .rose:      return "Dusty Rose"
         }
     }
-    
+
     var previewColor: Color {
         switch self {
         case .default:
@@ -346,8 +361,12 @@ enum ButtonColorScheme: String, CaseIterable, Identifiable {
             return Color(red: 255/255, green: 127/255, blue: 80/255)
         case .pink:
             return Color(red: 255/255, green: 20/255, blue: 147/255)
-        case .neonGreen:
-            return Color(red: 57/255, green: 255/255, blue: 20/255)
+        case .neonGreen: return Color(red: 57/255,  green: 255/255, blue: 20/255)
+        case .red:       return Color(red: 215/255, green: 50/255,  blue: 45/255)
+        case .cyan:      return Color(red: 0/255,   green: 195/255, blue: 210/255)
+        case .amber:     return Color(red: 215/255, green: 145/255, blue: 0/255)
+        case .indigo:    return Color(red: 65/255,  green: 82/255,  blue: 185/255)
+        case .rose:      return Color(red: 210/255, green: 100/255, blue: 130/255)
         }
     }
 }
