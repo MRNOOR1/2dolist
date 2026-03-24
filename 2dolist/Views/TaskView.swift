@@ -24,6 +24,7 @@ struct TaskView: View {
     @State private var hideContent = false
     @State private var collapseWorkItem: DispatchWorkItem?
     @State private var isCompletionAnimation = false
+    @State private var completionGreenOpacity: Double = 0
     @State private var isEditing = false
     @State private var editDetent: PresentationDetent = .height(540)
     @State private var isFocused = false
@@ -164,7 +165,7 @@ struct TaskView: View {
                     HStack(spacing: 8) {
                         if task.important || task.isRepeating {
                             Button(action: { markAsComplete() }) {
-                                Text("COMPLETE")
+                                Text(task.isRepeating ? "DONE TODAY" : "COMPLETE")
                                     .font(.system(size: 13, weight: .bold, design: .monospaced))
                                     .tracking(3)
                                     .frame(maxWidth: .infinity)
@@ -197,7 +198,7 @@ struct TaskView: View {
                         }
 
                         // Edit button
-                        Button { isEditing = true } label: {
+                        Button { collapseWorkItem?.cancel(); isEditing = true } label: {
                             Image(systemName: "pencil")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(st)
@@ -211,8 +212,24 @@ struct TaskView: View {
                     .padding(.horizontal, 12)
                     .padding(.bottom, 6)
 
+                    // CLOSE (repeating only) — permanently marks done, stops repeat
+                    if task.isRepeating {
+                        Button(action: closeTask) {
+                            Text("CLOSE PERMANENTLY")
+                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                                .tracking(3)
+                                .foregroundColor(st)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 32)
+                                .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 6)
+                    }
+
                     // FOCUS button
-                    Button { isFocused = true } label: {
+                    Button { collapseWorkItem?.cancel(); isFocused = true } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "scope")
                                 .font(.system(size: 10))
@@ -253,7 +270,7 @@ struct TaskView: View {
                             }
                         }
                         Spacer()
-                        Button { isEditing = true } label: {
+                        Button { collapseWorkItem?.cancel(); isEditing = true } label: {
                             Image(systemName: "pencil")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(st)
@@ -273,6 +290,7 @@ struct TaskView: View {
         .fixedSize(horizontal: false, vertical: isExpanded)
         .background(surf)
         .cornerRadius(4)
+        .overlay(RoundedRectangle(cornerRadius: 4).fill(Color.green.opacity(completionGreenOpacity)))
         .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
         .clipped()
         .opacity(hideContent ? 0 : 1)
@@ -341,17 +359,46 @@ struct TaskView: View {
     }
     private func stopTimer() { cancellable?.cancel() }
 
-    // MARK: - Completion (timing preserved)
-    internal func markAsComplete() {
+    // MARK: - Close (permanent — stops repeating)
+    private func closeTask() {
         if let id = task.notificationID { notifications.cancelNotification(with: id) }
-
-        withAnimation(.easeInOut(duration: 1)) {
+        collapseWorkItem?.cancel()
+        stopTimer()
+        withAnimation(.easeInOut(duration: 0.6)) {
+            completionGreenOpacity = 0.85
+        }
+        withAnimation(.easeInOut(duration: 1).delay(0.2)) {
             LatebackgroundColor = .green
             ImportantbackgroundColor = .green
             isCompletionAnimation = true
             hideContent = true
         }
-        withAnimation(.easeInOut(duration: 1.5)) {
+        withAnimation(.easeInOut(duration: 1.5).delay(0.2)) {
+            isExpanded = false
+            backgroundSize = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
+            task.isCompleted = true
+            task.completedAt = Date()
+            try? context.save()
+        }
+    }
+
+    // MARK: - Completion (timing preserved)
+    internal func markAsComplete() {
+        if let id = task.notificationID { notifications.cancelNotification(with: id) }
+        collapseWorkItem?.cancel()
+
+        withAnimation(.easeInOut(duration: 0.6)) {
+            completionGreenOpacity = 0.85
+        }
+        withAnimation(.easeInOut(duration: 1).delay(0.2)) {
+            LatebackgroundColor = .green
+            ImportantbackgroundColor = .green
+            isCompletionAnimation = true
+            hideContent = true
+        }
+        withAnimation(.easeInOut(duration: 1.5).delay(0.2)) {
             isExpanded = false
             backgroundSize = 0
         }
@@ -360,7 +407,7 @@ struct TaskView: View {
            let nextDate = nextOccurrence(after: task.expirationDate, days: task.repeatDays) {
             let capturedGroup = settings.selectedImportantGroup
             let capturedIndex = task.importantColorIndex
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
                 task.expirationDate = nextDate
                 task.updateRemainingTime()
                 task.notificationID = task.important
@@ -368,6 +415,7 @@ struct TaskView: View {
                     : notifications.sendNotification(taskName: task.task, at: nextDate)
                 try? context.save()
                 withAnimation(.easeInOut(duration: 0.3)) {
+                    completionGreenOpacity = 0
                     hideContent = false
                     backgroundSize = 56
                     isCompletionAnimation = false
@@ -377,7 +425,7 @@ struct TaskView: View {
                 startTimer()
             }
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
                 task.isCompleted = true
                 task.completedAt = Date()
                 try? context.save()
