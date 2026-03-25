@@ -27,6 +27,8 @@ class Task {
     var repeatDays: [Int] = []
     /// Optional free-text notes attached to the task.
     var notes: String = ""
+    /// When the task was first created. Used to calculate aging.
+    var createdAt: Date = Date()
 
     var isRepeating: Bool { !repeatDays.isEmpty }
 
@@ -41,6 +43,7 @@ class Task {
         self.completedAt = nil
         self.repeatDays = []
         self.notes = ""
+        self.createdAt = Date()
         self.updateRemainingTime()
     }
     

@@ -92,8 +92,13 @@ struct TaskListView: View {
         let filtered: [Task]
         switch selectedFilter {
         case .active:
-            // Exclude anything overdue (timeRemaining < 0); those go to OVERDUE / MISSED sections
-            filtered = sortedTasks.filter { !$0.isCompleted && $0.timeRemaining >= 0 }
+            // Exclude overdue (go to OVERDUE/MISSED sections).
+            // Also hide repeating tasks scheduled for a future day — only show them when due today.
+            filtered = sortedTasks.filter { task in
+                !task.isCompleted &&
+                task.timeRemaining >= 0 &&
+                (!task.isRepeating || Calendar.current.isDateInToday(task.expirationDate))
+            }
         case .closed:
             filtered = sortedTasks.filter { $0.isCompleted }
         }
@@ -374,8 +379,39 @@ struct TaskListView: View {
     }
 
     // ── Natural language parser ────────────────────────────────────────────
+
+    /// Pre-process: normalise a.m./p.m. → am/pm, then merge "3 pm" → "3pm".
+    private func normaliseWords(_ raw: [String]) -> [String] {
+        // Step 1 — normalise a.m. / p.m. → am / pm
+        let step1 = raw.map { w -> String in
+            let l = w.lowercased()
+            if l == "a.m." || l == "am." { return "am" }
+            if l == "p.m." || l == "pm." { return "pm" }
+            return w
+        }
+        // Step 2 — merge "10" "pm" → "10pm" and "10:30" "am" → "10:30am"
+        let digitTime = try? NSRegularExpression(pattern: "^\\d{1,2}(?::\\d{2})?$")
+        var result: [String] = []
+        var i = 0
+        while i < step1.count {
+            let w = step1[i]
+            if i + 1 < step1.count {
+                let next = step1[i + 1].lowercased()
+                if (next == "am" || next == "pm"),
+                   let re = digitTime,
+                   re.firstMatch(in: w, range: NSRange(w.startIndex..., in: w)) != nil {
+                    result.append(w + next)   // "3pm", "10:30am"
+                    i += 2; continue
+                }
+            }
+            result.append(w)
+            i += 1
+        }
+        return result
+    }
+
     private func parseNL(_ raw: String) -> (name: String, date: Date) {
-        let words = raw.components(separatedBy: " ").filter { !$0.isEmpty }
+        let words = normaliseWords(raw.components(separatedBy: " ").filter { !$0.isEmpty })
         let cal = Calendar.current
         let now = Date()
         var targetDate = cal.date(byAdding: .day, value: 1, to: now)!
@@ -396,15 +432,24 @@ struct TaskListView: View {
                 hour = 12; minute = 0; remove.insert(i)
             case "midnight":
                 hour = 0; minute = 0; remove.insert(i)
+            case "morning":
+                hour = 9;  minute = 0; remove.insert(i)
+            case "afternoon":
+                hour = 14; minute = 0; remove.insert(i)
+            case "evening":
+                hour = 19; minute = 0; remove.insert(i)
+            case "night":
+                hour = 21; minute = 0; remove.insert(i)
             case "at":
-                if i + 1 < words.count, let t = nlTime(words[i + 1]) {
-                    hour = t.0; minute = t.1; remove.insert(i); remove.insert(i + 1); i += 1
-                } else if i + 2 < words.count,
-                          let n = Int(words[i + 1]),
-                          ["am","pm"].contains(words[i + 2].lowercased()) {
-                    let ap = words[i + 2].lowercased()
-                    hour = ap == "pm" && n < 12 ? n + 12 : (ap == "am" && n == 12 ? 0 : n)
-                    minute = 0; remove.insert(i); remove.insert(i+1); remove.insert(i+2); i += 2
+                if i + 1 < words.count {
+                    let next = words[i + 1].lowercased()
+                    if next == "noon" {
+                        hour = 12; minute = 0; remove.insert(i); remove.insert(i+1); i += 1
+                    } else if next == "midnight" {
+                        hour = 0; minute = 0; remove.insert(i); remove.insert(i+1); i += 1
+                    } else if let t = nlTime(words[i + 1]) {
+                        hour = t.0; minute = t.1; remove.insert(i); remove.insert(i+1); i += 1
+                    }
                 }
             case "next":
                 if i + 1 < words.count, let di = weekdays.firstIndex(of: words[i+1].lowercased()) {
@@ -419,13 +464,18 @@ struct TaskListView: View {
                     if unit.hasPrefix("day") {
                         targetDate = cal.date(byAdding: .day, value: n, to: now)!
                         remove.insert(i); remove.insert(i+1); remove.insert(i+2); i += 2
-                    } else if unit.hasPrefix("hour") {
-                        targetDate = now.addingTimeInterval(Double(n) * 3600)
-                        hour = cal.component(.hour, from: targetDate)
-                        minute = cal.component(.minute, from: targetDate)
-                        var dc = cal.dateComponents([.year, .month, .day], from: now)
-                        dc.hour = hour; dc.minute = minute
-                        targetDate = cal.date(from: dc) ?? targetDate
+                    } else if unit.hasPrefix("hour") || unit.hasPrefix("hr") {
+                        // Use the actual future timestamp — preserves day crossing
+                        let future = now.addingTimeInterval(Double(n) * 3600)
+                        targetDate = future
+                        hour = cal.component(.hour, from: future)
+                        minute = cal.component(.minute, from: future)
+                        remove.insert(i); remove.insert(i+1); remove.insert(i+2); i += 2
+                    } else if unit.hasPrefix("min") {
+                        let future = now.addingTimeInterval(Double(n) * 60)
+                        targetDate = future
+                        hour = cal.component(.hour, from: future)
+                        minute = cal.component(.minute, from: future)
                         remove.insert(i); remove.insert(i+1); remove.insert(i+2); i += 2
                     }
                 }
@@ -442,7 +492,7 @@ struct TaskListView: View {
             i += 1
         }
 
-        // Apply time component
+        // Combine the resolved day with the resolved time
         var dc = cal.dateComponents([.year, .month, .day], from: targetDate)
         dc.hour = hour ?? 9; dc.minute = minute; dc.second = 0
         let finalDate = cal.date(from: dc) ?? targetDate
@@ -456,25 +506,27 @@ struct TaskListView: View {
         return (name.isEmpty ? raw : name, finalDate)
     }
 
-    /// Parse a single word like "3pm", "10:30am", "15:00" into (hour, minute).
+    /// Parse a single token into (hour, minute). Handles:
+    ///   attached am/pm  → "3pm" "10:30AM" "3PM"
+    ///   24-hour         → "15:00" "09:30"
     private func nlTime(_ word: String) -> (Int, Int)? {
         let w = word.lowercased()
-        // "3pm", "11am", "3:30pm", "10:00am"
+        // "3pm", "11am", "3:30pm", "10:00am" — case-insensitive via lowercased()
         if let m = try? NSRegularExpression(pattern: "^(\\d{1,2})(?::(\\d{2}))?(am|pm)$")
             .firstMatch(in: w, range: NSRange(w.startIndex..., in: w)) {
             let ns = w as NSString
             var h = Int(ns.substring(with: m.range(at: 1))) ?? 0
             let min = m.range(at: 2).length > 0 ? (Int(ns.substring(with: m.range(at: 2))) ?? 0) : 0
-            let ap = m.range(at: 3).length > 0 ? ns.substring(with: m.range(at: 3)) : ""
+            let ap  = m.range(at: 3).length > 0 ? ns.substring(with: m.range(at: 3)) : ""
             if ap == "pm" && h < 12 { h += 12 }
             if ap == "am" && h == 12 { h = 0 }
             return (h, min)
         }
-        // "15:00", "09:30" (24-hour, no am/pm suffix)
+        // "15:00", "09:30" — 24-hour, no am/pm suffix
         if let m = try? NSRegularExpression(pattern: "^([01]?\\d|2[0-3]):(\\d{2})$")
             .firstMatch(in: w, range: NSRange(w.startIndex..., in: w)) {
             let ns = w as NSString
-            let h = Int(ns.substring(with: m.range(at: 1))) ?? 0
+            let h   = Int(ns.substring(with: m.range(at: 1))) ?? 0
             let min = Int(ns.substring(with: m.range(at: 2))) ?? 0
             return (h, min)
         }
@@ -499,7 +551,8 @@ struct TaskListView: View {
     private func taskRow(_ task: Task) -> some View {
         TaskView(task: task, isCompleted: task.isCompleted)
             .swipeActions(edge: .leading) {
-                if !task.isCompleted {
+                // Repeating tasks must use DONE TODAY inside the card — swipe bypasses rescheduling
+                if !task.isCompleted && !task.isRepeating {
                     Button {
                         task.isCompleted = true
                         task.completedAt = Date()

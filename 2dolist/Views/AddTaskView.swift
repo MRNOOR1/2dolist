@@ -270,6 +270,7 @@ struct AddTaskView: View {
             }
         }
 
+        task.updateRemainingTime()
         context.insert(task)
         try? context.save()
         dismiss()

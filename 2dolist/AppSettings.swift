@@ -48,7 +48,7 @@ class AppSettings {
            let buttonScheme = ButtonColorScheme(rawValue: savedButtonScheme) {
             self.buttonColorScheme = buttonScheme
         }
-    }
+    } 
     
     func getButtonColor(for colorScheme: ColorScheme) -> Color {
         switch buttonColorScheme {

@@ -27,6 +27,7 @@ struct TaskView: View {
     @State private var isEditing = false
     @State private var editDetent: PresentationDetent = .height(540)
     @State private var isFocused = false
+    @State private var showDeleteConfirm = false
 
     // ── Adaptive theme ─────────────────────────────────────────────────────
     private var surf: Color {
@@ -87,6 +88,15 @@ struct TaskView: View {
         if task.repeatDays.count == 7 { return "DAILY" }
         let letters = ["S","M","T","W","T","F","S"]
         return task.repeatDays.sorted().map { letters[$0] }.joined(separator: "·")
+    }
+
+    // ── Task aging (amber tint when task has been sitting > 3 days) ────────
+    private var agingTintOpacity: Double {
+        guard !isCompleted && !task.isRepeating && !isCompletionAnimation else { return 0 }
+        let days = Date().timeIntervalSince(task.createdAt) / 86400
+        if days >= 7 { return 0.13 }
+        if days >= 3 { return 0.07 }
+        return 0
     }
 
     // ── Left accent bar ────────────────────────────────────────────────────
@@ -258,6 +268,20 @@ struct TaskView: View {
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 12)
+                    .padding(.bottom, 6)
+
+                    // DELETE button
+                    Button { collapseWorkItem?.cancel(); showDeleteConfirm = true } label: {
+                        Text("DELETE TASK")
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                            .tracking(3)
+                            .foregroundColor(lateRed)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 32)
+                            .overlay(RoundedRectangle(cornerRadius: 4).stroke(lateRed.opacity(0.4), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 12)
                     .padding(.bottom, 12)
                 }
 
@@ -296,6 +320,19 @@ struct TaskView: View {
                         .buttonStyle(.plain)
                     }
                     .padding(.horizontal, 12)
+                    .padding(.bottom, 6)
+
+                    Button { collapseWorkItem?.cancel(); showDeleteConfirm = true } label: {
+                        Text("DELETE TASK")
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                            .tracking(3)
+                            .foregroundColor(lateRed)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 32)
+                            .overlay(RoundedRectangle(cornerRadius: 4).stroke(lateRed.opacity(0.4), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 12)
                     .padding(.bottom, 12)
                 }
             }
@@ -304,6 +341,7 @@ struct TaskView: View {
         .fixedSize(horizontal: false, vertical: isExpanded)
         .background(surf)
         .cornerRadius(4)
+        .overlay(RoundedRectangle(cornerRadius: 4).fill(missedAmber.opacity(agingTintOpacity)))
         .overlay(RoundedRectangle(cornerRadius: 4).fill(Color.green.opacity(completionGreenOpacity)))
         .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
         .clipped()
@@ -317,6 +355,16 @@ struct TaskView: View {
         .fullScreenCover(isPresented: $isFocused) {
             FocusView(task: task, onComplete: markAsComplete)
                 .environment(settings)
+        }
+        .alert("Delete Task", isPresented: $showDeleteConfirm) {
+            Button("Delete", role: .destructive) {
+                stopTimer()
+                context.delete(task)
+                try? context.save()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This cannot be undone.")
         }
         .onAppear {
             ImportantbackgroundColor = task.important
@@ -367,6 +415,7 @@ struct TaskView: View {
         if let id = task.notificationID { notifications.cancelNotification(with: id) }
         collapseWorkItem?.cancel()
         stopTimer()
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
         withAnimation(.easeInOut(duration: 0.6)) {
             completionGreenOpacity = 0.85
         }
@@ -391,6 +440,7 @@ struct TaskView: View {
     internal func markAsComplete() {
         if let id = task.notificationID { notifications.cancelNotification(with: id) }
         collapseWorkItem?.cancel()
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
 
         withAnimation(.easeInOut(duration: 0.6)) {
             completionGreenOpacity = 0.85
