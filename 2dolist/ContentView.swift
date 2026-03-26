@@ -29,10 +29,17 @@ struct ContentView: View {
     let notificationManager = NotificationManager()
 
     // ── Derived forecast — always in sync with live task data ───────────────
-    private var weather: String {
-        activeTasks.count == 0 ? "CLEAR" : (activeTasks.count > 7 ? "STORM" : "CLOUDY")
+    // Only count tasks the user actually sees as active:
+    // non-repeating tasks count always; repeating tasks only count when due today.
+    private var visibleActiveCount: Int {
+        activeTasks.filter { task in
+            !task.isRepeating || Calendar.current.isDateInToday(task.expirationDate)
+        }.count
     }
-    private var forecastProgress: Double { min(Double(activeTasks.count) / 8.0, 1.0) }
+    private var weather: String {
+        visibleActiveCount == 0 ? "CLEAR" : (visibleActiveCount > 7 ? "STORM" : "CLOUDY")
+    }
+    private var forecastProgress: Double { min(Double(visibleActiveCount) / 8.0, 1.0) }
 
     // ── Adaptive theme ─────────────────────────────────────────────────────
     private var bg: Color {
@@ -91,7 +98,7 @@ struct ContentView: View {
                         }
                         .frame(height: 2)
 
-                        Text("\(activeTasks.count) ACTIVE  ·  \(completedTasks.count) COMPLETE")
+                        Text("\(visibleActiveCount) ACTIVE  ·  \(completedTasks.count) COMPLETE")
                             .font(.system(size: 11, weight: .regular, design: .monospaced))
                             .tracking(2)
                             .foregroundColor(st)
@@ -145,7 +152,7 @@ struct ContentView: View {
             }
         }
         .onAppear { notificationManager.askPermission() }
-        .onChange(of: activeTasks.count) { oldCount, newCount in
+        .onChange(of: visibleActiveCount) { oldCount, newCount in
             if newCount == 0 && oldCount > 0 && !completedTasks.isEmpty {
                 showConfetti = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {

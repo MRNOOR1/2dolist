@@ -7,6 +7,15 @@ import SwiftUI
 import Combine
 import SwiftData
 
+// Dims button on press so taps feel immediate and tactile
+private struct PressStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.55 : 1)
+            .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
+    }
+}
+
 struct TaskView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.colorScheme) var colorScheme
@@ -173,6 +182,7 @@ struct TaskView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3.5, execute: item)
                     }
                 }
+                .simultaneousGesture(isCompleted ? nil : longPressToToggleImportant())
 
                 // ── Expanded: active ───────────────────────────────────────
                 if isExpanded && !isCompleted {
@@ -198,7 +208,7 @@ struct TaskView: View {
                                     .background(accent)
                                     .cornerRadius(4)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(PressStyle())
                         } else {
                             Button(action: { markAsComplete() }) {
                                 Text("COMPLETE")
@@ -210,7 +220,7 @@ struct TaskView: View {
                                     .background(accent)
                                     .cornerRadius(4)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(PressStyle())
 
                             Text(task.formattedTime())
                                 .font(.system(size: 12, weight: .semibold, design: .monospaced))
@@ -231,7 +241,7 @@ struct TaskView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
                                 .cornerRadius(4)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressStyle())
                     }
                     .padding(.horizontal, 12)
                     .padding(.bottom, 6)
@@ -247,7 +257,7 @@ struct TaskView: View {
                                 .frame(height: 32)
                                 .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressStyle())
                         .padding(.horizontal, 12)
                         .padding(.bottom, 6)
                     }
@@ -266,7 +276,7 @@ struct TaskView: View {
                         .frame(height: 32)
                         .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     .padding(.horizontal, 12)
                     .padding(.bottom, 6)
 
@@ -280,7 +290,7 @@ struct TaskView: View {
                             .frame(height: 32)
                             .overlay(RoundedRectangle(cornerRadius: 4).stroke(lateRed.opacity(0.4), lineWidth: 1))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     .padding(.horizontal, 12)
                     .padding(.bottom, 12)
                 }
@@ -317,7 +327,7 @@ struct TaskView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
                                 .cornerRadius(4)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressStyle())
                     }
                     .padding(.horizontal, 12)
                     .padding(.bottom, 6)
@@ -331,7 +341,7 @@ struct TaskView: View {
                             .frame(height: 32)
                             .overlay(RoundedRectangle(cornerRadius: 4).stroke(lateRed.opacity(0.4), lineWidth: 1))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     .padding(.horizontal, 12)
                     .padding(.bottom, 12)
                 }
@@ -346,7 +356,6 @@ struct TaskView: View {
         .overlay(RoundedRectangle(cornerRadius: 4).stroke(hl, lineWidth: 1))
         .clipped()
         .opacity(hideContent ? 0 : 1)
-        .simultaneousGesture(isCompleted ? nil : longPressToToggleImportant())
         .sheet(isPresented: $isEditing, onDismiss: { editDetent = .height(540) }) {
             EditTaskView(task: task, selectedDetent: $editDetent)
                 .presentationDetents([.height(540), .height(640), .large], selection: $editDetent)
@@ -572,7 +581,7 @@ struct FocusView: View {
                             .background(hl)
                             .cornerRadius(4)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressStyle())
                     Spacer()
                     Text("FOCUS")
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
@@ -652,7 +661,7 @@ struct FocusView: View {
                         .background(accent)
                         .cornerRadius(4)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressStyle())
                 .padding(.horizontal, 24)
                 .padding(.bottom, 48)
             }
